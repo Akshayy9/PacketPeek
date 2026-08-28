@@ -20,6 +20,8 @@ export interface IProduct extends Document {
   ingredients_list: string[] | null;
   nutrients_per_100g: INutrientsPer100g | null;
   nutri_score: string | null;
+  category: string | null;
+  sub_category: string | null;
   source: 'off' | 'manual';
   created_at: Date;
   updated_at: Date;
@@ -49,6 +51,8 @@ const ProductSchema = new Schema<IProduct>(
     ingredients_list: { type: [String], default: null },
     nutrients_per_100g: { type: NutrientsPer100gSchema, default: null },
     nutri_score: { type: String, default: null },
+    category: { type: String, default: null, index: true },
+    sub_category: { type: String, default: null },
     source: { type: String, enum: ['off', 'manual'], required: true },
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now },

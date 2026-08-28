@@ -16,11 +16,11 @@ async function runBackfill() {
         const pendingProducts = await Product.find({ barcode: /^manual_/ });
         console.log(`Found ${pendingProducts.length} products to enrich.`);
 
-        // --- Tracking Counters ---
         let successCount = 0;
         let duplicateCount = 0;
         let lowScoreCount = 0;
         let notFoundCount = 0;
+        let apiErrorCount = 0;
 
         for (let i = 0; i < pendingProducts.length; i++) {
             const prod = pendingProducts[i];
@@ -30,17 +30,41 @@ async function runBackfill() {
 
             const offSearchUrl = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(searchQuery)}&search_simple=1&action=process&json=1&page_size=1`;
 
-            const response = await fetch(offSearchUrl, {
-                headers: { 'User-Agent': 'PacketPeek-Backfill/1.0' }
-            });
+            // --- RETRY LOGIC ---
+            let apiSuccess = false;
+            let retries = 0;
+            const MAX_RETRIES = 3;
+            let data: any = null;
 
-            if (!response.ok) {
-                console.log(`  -> OFF API error: ${response.status}`);
-                await sleep(1000);
-                continue;
+            while (!apiSuccess && retries < MAX_RETRIES) {
+                const response = await fetch(offSearchUrl, {
+                    headers: { 'User-Agent': 'PacketPeek-Backfill/1.0' }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 503 || response.status === 429 || response.status === 502) {
+                        retries++;
+                        console.log(`  -> Server busy (${response.status}). Waiting 5 seconds... (Attempt ${retries}/${MAX_RETRIES})`);
+                        await sleep(5000); // Wait 5 seconds before retrying
+                        continue;
+                    } else {
+                        console.log(`  -> Fatal API error: ${response.status}`);
+                        apiErrorCount++;
+                        break; // Break out of the retry loop for 400/404 errors
+                    }
+                }
+
+                data = (await response.json()) as any;
+                apiSuccess = true;
             }
 
-            const data = (await response.json()) as any;
+            // If we failed all retries, move to the next product
+            if (!apiSuccess || !data) {
+                if (retries === MAX_RETRIES) apiErrorCount++;
+                continue;
+            }
+            // -------------------
+
             const offProducts = data.products || [];
 
             if (offProducts.length > 0) {
@@ -76,10 +100,10 @@ async function runBackfill() {
                 console.log(`  -> No results found on Open Food Facts.`);
             }
 
-            await sleep(1000);
+            // Base delay of 2.5 seconds between every product to stay completely under the radar
+            await sleep(2500);
         }
 
-        // --- Final Summary Report ---
         console.log(`\n========================================`);
         console.log(`           BACKFILL SUMMARY             `);
         console.log(`========================================`);
@@ -88,6 +112,7 @@ async function runBackfill() {
         console.log(`⚠️ Skipped Duplicates : ${duplicateCount}`);
         console.log(`❌ Skipped (Low Match): ${lowScoreCount}`);
         console.log(`🔍 Not Found on OFF   : ${notFoundCount}`);
+        console.log(`💀 API Timeouts/Errors: ${apiErrorCount}`);
         console.log(`========================================\n`);
 
     } catch (error) {
