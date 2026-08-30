@@ -6,6 +6,48 @@ import { mergeOrInsertOFFProduct } from '../services/productInterceptor';
 const router = Router();
 
 /**
+ * GET /api/product/category/:categoryName
+ * Fetch products by category, paginated and case-insensitive
+ */
+router.get('/category/:categoryName', async (req: Request, res: Response) => {
+  try {
+    const { categoryName } = req.params;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 12;
+    const skip = (page - 1) * limit;
+
+    const decodedCategory = decodeURIComponent(categoryName);
+    
+    let searchTerm = decodedCategory;
+    if (searchTerm.toLowerCase() === 'cold drinks') {
+      searchTerm = 'JUICE';
+    } else if (searchTerm.toLowerCase().endsWith('s')) {
+      searchTerm = searchTerm.slice(0, -1);
+    }
+    
+    const filter = { category: { $regex: new RegExp(searchTerm, 'i') } };
+    
+    const products = await Product.find(filter)
+      .skip(skip)
+      .limit(limit)
+      .lean();
+      
+    const total = await Product.countDocuments(filter);
+    
+    res.json({
+      products,
+      page,
+      limit,
+      total,
+      hasMore: skip + products.length < total
+    });
+  } catch (err) {
+    console.error(`[ERROR] /api/product/category/${req.params.categoryName}:`, err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
  * GET /api/product/:barcode
  *
  * 1. Check MongoDB cache (exact barcode match)
@@ -18,8 +60,8 @@ const router = Router();
 router.get('/:barcode', async (req: Request, res: Response) => {
   const { barcode } = req.params;
 
-  if (!barcode || !/^\d{8,14}$/.test(barcode)) {
-    res.status(400).json({ error: 'Invalid barcode format. Expected 8–14 digits.' });
+  if (!barcode || !/^[\w-]+$/.test(barcode)) {
+    res.status(400).json({ error: 'Invalid barcode format.' });
     return;
   }
 
