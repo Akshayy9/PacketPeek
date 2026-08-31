@@ -11,7 +11,8 @@ export interface INutrientsPer100g {
 }
 
 export interface IProduct extends Document {
-  barcode: string;
+  barcode?: string;
+  data_source: 'MANUAL' | 'OFF_SEED';
   brand_key: string | null;
   product_name: string;
   brand: string | null;
@@ -43,7 +44,8 @@ const NutrientsPer100gSchema = new Schema<INutrientsPer100g>(
 
 const ProductSchema = new Schema<IProduct>(
   {
-    barcode: { type: String, required: true, unique: true, index: true },
+    barcode: { type: String, unique: true, sparse: true },
+    data_source: { type: String, enum: ['MANUAL', 'OFF_SEED'], default: 'MANUAL' },
     brand_key: { type: String, default: null },
     product_name: { type: String, required: true },
     brand: { type: String, default: null },
