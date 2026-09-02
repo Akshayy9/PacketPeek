@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-export interface INutrientsPer100g {
+export interface INutrients {
   energy_kcal: number | null;
   sugar_g: number | null;
   protein_g: number | null;
@@ -19,8 +19,14 @@ export interface IProduct extends Document {
   image_url: string | null;
   ingredients_text: string | null;
   ingredients_list: string[] | null;
-  nutrients_per_100g: INutrientsPer100g | null;
+  nutrients_per_100g: INutrients | null;
+  nutrients_per_serving: INutrients | null;
+  serving_size: string | null;
+  serving_quantity: number | null;
   nutri_score: 'A' | 'B' | 'C' | 'D' | 'E' | null;
+  nova_group: 1 | 2 | 3 | 4 | null;
+  vegetarian_status: 'veg' | 'non-veg' | 'unknown';
+  allergens_tags: string[];
   category: string | null;
   sub_category: string | null;
   flagged_additives: string[];
@@ -29,7 +35,7 @@ export interface IProduct extends Document {
   updated_at: Date;
 }
 
-const NutrientsPer100gSchema = new Schema<INutrientsPer100g>(
+const NutrientsSchema = new Schema<INutrients>(
   {
     energy_kcal: { type: Number, default: null },
     sugar_g: { type: Number, default: null },
@@ -52,8 +58,14 @@ const ProductSchema = new Schema<IProduct>(
     image_url: { type: String, default: null },
     ingredients_text: { type: String, default: null },
     ingredients_list: { type: [String], default: null },
-    nutrients_per_100g: { type: NutrientsPer100gSchema, default: null },
+    nutrients_per_100g: { type: NutrientsSchema, default: null },
+    nutrients_per_serving: { type: NutrientsSchema, default: null },
+    serving_size: { type: String, default: null },
+    serving_quantity: { type: Number, default: null },
     nutri_score: { type: String, default: null, enum: ['A', 'B', 'C', 'D', 'E', null] },
+    nova_group: { type: Number, enum: [1, 2, 3, 4, null], default: null },
+    vegetarian_status: { type: String, enum: ['veg', 'non-veg', 'unknown'], default: 'unknown' },
+    allergens_tags: { type: [String], default: [] },
     category: { type: String, default: null, index: true },
     sub_category: { type: String, default: null },
     flagged_additives: { type: [String], default: [] },
