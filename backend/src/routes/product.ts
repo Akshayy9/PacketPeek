@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { Product } from '../models/Product';
 import { fetchFromOFF } from '../services/offClient';
 import { mergeOrInsertOFFProduct } from '../services/productInterceptor';
+import { pinecone, PINECONE_INDEX_NAME, generateQueryEmbedding } from '../utils/pinecone';
 
 const router = Router();
 
@@ -48,7 +49,7 @@ router.get('/category/:categoryName', async (req: Request, res: Response) => {
 });
 /**
  * GET /api/product/search/query
- * Search products by name (fuzzy match)
+ * Search products by semantic vector search using Pinecone
  */
 router.get('/search/query', async (req: Request, res: Response) => {
   try {
@@ -57,9 +58,54 @@ router.get('/search/query', async (req: Request, res: Response) => {
       res.json([]);
       return;
     }
-    const filter = { product_name: { $regex: new RegExp(q, 'i') } };
-    const products = await Product.find(filter).limit(8).lean();
-    res.json(products);
+
+    const queryVector = await generateQueryEmbedding(q);
+    const index = pinecone.index(PINECONE_INDEX_NAME);
+    
+    let queryResponse;
+    try {
+      queryResponse = await index.query({
+        vector: queryVector,
+        topK: 15,
+        includeMetadata: true
+      });
+    } catch (pineconeErr) {
+      console.warn(`[WARNING] Pinecone query failed (DB might be empty):`, pineconeErr);
+      res.json([]);
+      return;
+    }
+
+    if (!queryResponse?.matches || queryResponse.matches.length === 0) {
+      res.json([]);
+      return;
+    }
+
+    // Sort manual matches to the top, preserving score order within groups
+    const sortedMatches = [...queryResponse.matches].sort((a, b) => {
+      const aManual = a.metadata?.is_manual === true;
+      const bManual = b.metadata?.is_manual === true;
+      
+      if (aManual && !bManual) return -1;
+      if (!aManual && bManual) return 1;
+      
+      // Both are same type, fallback to Pinecone score
+      const scoreA = a.score ?? 0;
+      const scoreB = b.score ?? 0;
+      return scoreB - scoreA;
+    });
+
+    const mongoIds = sortedMatches.map(match => match.metadata?.mongoId as string).filter(Boolean);
+
+    // Fetch from MongoDB
+    const products = await Product.find({ _id: { $in: mongoIds } }).lean();
+
+    // Map documents to a dictionary for O(1) lookup
+    const productMap = new Map(products.map(p => [p._id.toString(), p]));
+
+    // Reconstruct the array to perfectly match the sorted Pinecone order
+    const orderedProducts = mongoIds.map(id => productMap.get(id)).filter(Boolean);
+
+    res.json(orderedProducts);
   } catch (err) {
     console.error(`[ERROR] /api/product/search/query:`, err);
     res.status(500).json({ error: 'Internal server error' });
