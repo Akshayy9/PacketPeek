@@ -48,3 +48,5 @@ yarn-debug.log*
 yarn-error.log*
 
 openfoodfacts-products.jsonl.gz
+
+firebase-admin.json

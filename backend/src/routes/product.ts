@@ -3,6 +3,7 @@ import { Product } from '../models/Product';
 import { fetchFromOFF } from '../services/offClient';
 import { mergeOrInsertOFFProduct } from '../services/productInterceptor';
 import { pinecone, PINECONE_INDEX_NAME, generateQueryEmbedding } from '../utils/pinecone';
+import { verifyAuth, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
@@ -239,4 +240,74 @@ ${product.ingredients_text}
   }
 });
 
+/**
+ * GET /api/product/contributions
+ * Protected — returns all products contributed by the authenticated user,
+ * newest first.
+ */
+router.get('/contributions', verifyAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const uid = req.user!.uid;
+    const contributions = await Product
+      .find({ contributor_uid: uid })
+      .sort({ created_at: -1 })
+      .lean();
+
+    res.json({ count: contributions.length, products: contributions });
+  } catch (err) {
+    console.error('[ERROR] GET /api/product/contributions:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * PUT /api/product/:id
+ * Protected — allows a contributor to edit their own product.
+ * Returns 403 if the authenticated user does not own this product.
+ * Allowed editable fields: barcode, product_name, brand, ingredients_text,
+ * nutrients_per_100g, nutri_score, nova_group, allergens_tags, flagged_additives,
+ * category, sub_category, image_url, vegetarian_status.
+ */
+router.put('/:id', verifyAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const uid = req.user!.uid;
+
+    const product = await Product.findById(id);
+    if (!product) {
+      res.status(404).json({ error: 'Product not found' });
+      return;
+    }
+
+    // ── Ownership check ──────────────────────────────────────────────────
+    if (product.contributor_uid !== uid) {
+      res.status(403).json({ error: 'Forbidden: You did not contribute this product' });
+      return;
+    }
+
+    // ── Apply only safe, whitelisted fields ──────────────────────────────
+    const ALLOWED_FIELDS = [
+      'barcode', 'product_name', 'brand', 'image_url',
+      'ingredients_text', 'ingredients_list',
+      'nutrients_per_100g', 'nutri_score', 'nova_group',
+      'allergens_tags', 'flagged_additives',
+      'category', 'sub_category', 'vegetarian_status',
+    ] as const;
+
+    for (const field of ALLOWED_FIELDS) {
+      if (req.body[field] !== undefined) {
+        (product as any)[field] = req.body[field];
+      }
+    }
+
+    await product.save();
+
+    res.json({ success: true, product: product.toObject() });
+  } catch (err) {
+    console.error(`[ERROR] PUT /api/product/${req.params.id}:`, err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
+

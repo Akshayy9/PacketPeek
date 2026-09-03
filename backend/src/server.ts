@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { connectDB } from './config/db';
 import productRouter from './routes/product';
+import aiRouter from './routes/ai';
 
 const app = express();
 const PORT = parseInt(process.env.PORT ?? '4000', 10);
@@ -16,7 +17,7 @@ app.use(
       // Allow any origin in development — tighten in production
       ...(process.env.NODE_ENV !== 'production' ? ['*'] : []),
     ],
-    methods: ['GET', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
   })
 );
 app.use(express.json());
@@ -27,6 +28,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/api/product', productRouter);
+app.use('/api/products', aiRouter);
 
 // ── 404 catch-all ───────────────────────────────────────────────────────────
 app.use((_req, res) => {

@@ -31,6 +31,8 @@ export interface IProduct extends Document {
   sub_category: string | null;
   flagged_additives: string[];
   source: 'off' | 'manual';
+  contributor_uid?: string;     // Firebase UID of the user who submitted this
+  contributor_email?: string;   // Email for display purposes
   created_at: Date;
   updated_at: Date;
 }
@@ -70,6 +72,8 @@ const ProductSchema = new Schema<IProduct>(
     sub_category: { type: String, default: null },
     flagged_additives: { type: [String], default: [] },
     source: { type: String, enum: ['off', 'manual'], required: true },
+    contributor_uid:   { type: String, index: true, default: null },
+    contributor_email: { type: String, default: null },
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now },
   },
