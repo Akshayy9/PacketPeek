@@ -1,4 +1,4 @@
-# PacketPeek — Zaika Score (Phase 1)
+# PacketPeek 
 
 > Scan a packaged food barcode in your browser → get product data from Open Food Facts → cached in MongoDB.
 

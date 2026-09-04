@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = 'edge';
+
 import { useEffect, useState, useCallback, use, useRef } from "react";
 import Image from "next/image";
 import type { IProductData } from "@/app/scan/page";
