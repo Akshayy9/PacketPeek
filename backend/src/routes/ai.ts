@@ -39,7 +39,7 @@ Extract the following information in strict JSON format:
   "product_name": "string",
   "brand": "string",
   "ingredients_text": "string (full ingredients list)",
-  "nutrients_per_100g": { "energy": number, "sugars": number, "fat": number, "salt": number },
+  "nutrients_per_100g": { "energy_kcal": number, "sugar_g": number, "protein_g": number, "fat_g": number, "saturated_fat_g": number, "fibre_g": number, "sodium_mg": number },
   "allergens_tags": ["string", "string"],
   "nova_group": number (1 to 4, based on processing level),
   "nutriscore_grade": "string (a, b, c, d, or e)"

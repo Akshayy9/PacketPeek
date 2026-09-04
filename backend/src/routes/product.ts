@@ -114,6 +114,26 @@ router.get('/search/query', async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/product/contributions
+ * Protected — returns all products contributed by the authenticated user,
+ * newest first.
+ */
+router.get('/contributions', verifyAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const uid = req.user!.uid;
+    const contributions = await Product
+      .find({ contributor_uid: uid })
+      .sort({ created_at: -1 })
+      .lean();
+
+    res.json({ count: contributions.length, products: contributions });
+  } catch (err) {
+    console.error('[ERROR] GET /api/product/contributions:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
  * GET /api/product/:barcode
  *
  * 1. Check MongoDB cache (exact barcode match)
@@ -240,25 +260,6 @@ ${product.ingredients_text}
   }
 });
 
-/**
- * GET /api/product/contributions
- * Protected — returns all products contributed by the authenticated user,
- * newest first.
- */
-router.get('/contributions', verifyAuth, async (req: AuthRequest, res: Response) => {
-  try {
-    const uid = req.user!.uid;
-    const contributions = await Product
-      .find({ contributor_uid: uid })
-      .sort({ created_at: -1 })
-      .lean();
-
-    res.json({ count: contributions.length, products: contributions });
-  } catch (err) {
-    console.error('[ERROR] GET /api/product/contributions:', err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
 
 /**
  * PUT /api/product/:id
