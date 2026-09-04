@@ -14,8 +14,9 @@ app.use(
     origin: [
       'http://localhost:3000',
       'http://localhost:3001',
+      'https://packetpeek-998.pages.dev'
       // Allow any origin in development — tighten in production
-      ...(process.env.NODE_ENV !== 'production' ? ['*'] : []),
+
     ],
     methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
   })
