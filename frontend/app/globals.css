@@ -297,88 +297,139 @@ a {
 
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   8. MOBILE RESPONSIVE OVERRIDES
-   Uses data-* attribute selectors + !important to override inline styles.
-   Desktop (≥768px) is UNCHANGED — all rules are mobile-first, scoped to max-width.
+   8. LAYOUT CLASSES (Grid/Flex layouts extracted from inline styles for responsiveness)
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Desktop defaults ────────────────────────────────────────────────────── */
+.hero-inner {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.category-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.category-product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.pdp-hero-grid {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+}
+
+.pdp-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.contrib-stats {
+  display: flex;
+  flex-direction: row;
+}
+
+.contrib-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   9. MOBILE RESPONSIVE OVERRIDES  (max-width: 767px)
+   !important only used where inline styles are still present.
+   Class-based grid rules override cleanly without !important.
 ══════════════════════════════════════════════════════════════════════════════ */
 
 @media (max-width: 767px) {
 
-  /* ── Prevent any horizontal overflow ─────────────────────────────────────── */
+  /* ── Prevent horizontal overflow ─────────────────────────────────────────── */
   html, body {
     overflow-x: hidden !important;
   }
 
-  /* ── SCAN PAGE: Root wrapper ─────────────────────────────────────────────── */
+  /* ── SCAN PAGE ───────────────────────────────────────────────────────────── */
   [data-page="scan"] {
     zoom: 1 !important;
     background-size: cover !important;
     background-position: center top !important;
   }
+  [data-page="scan"] main {
+    padding-top: 80px !important;
+  }
 
-  /* ── ALL NAVBARS: Reduce horizontal padding ──────────────────────────────── */
+  /* ── ALL NAVBARS ─────────────────────────────────────────────────────────── */
   [data-nav="scan"],
   [data-nav="category"],
   [data-nav="product"] {
     padding: 0 16px !important;
   }
-
-  /* ── Hide desktop nav links on mobile ────────────────────────────────────── */
   [data-desktop-links] {
     display: none !important;
   }
-
-  /* ── Show hamburger button on mobile ─────────────────────────────────────── */
   [data-hamburger] {
     display: flex !important;
   }
 
-  /* ── SCAN HERO: Stack vertically, reduce padding ─────────────────────────── */
+  /* ── HERO SECTION ────────────────────────────────────────────────────────── */
   [data-hero] {
     padding: 24px 16px 32px !important;
   }
-
-  [data-hero-inner] {
-    flex-direction: column !important;
-    gap: 32px !important;
-    align-items: center !important;
+  .hero-inner {
+    flex-direction: column;
+    gap: 32px;
+    align-items: center;
   }
-
-  /* ── Scanner mockup: shrink for mobile ───────────────────────────────────── */
   [data-scanner-col] {
     width: 100% !important;
     max-width: 320px !important;
     flex: none !important;
   }
-
-  /* ── Hero text column: center on mobile ──────────────────────────────────── */
   [data-text-col] {
     flex: none !important;
     width: 100% !important;
     align-items: center !important;
     text-align: center !important;
   }
-
-  /* ── Hero h1: scale down ─────────────────────────────────────────────────── */
   [data-hero-title] {
     font-size: 36px !important;
     margin-bottom: 16px !important;
   }
 
-  /* ── OCR Section: reduce the huge top padding ────────────────────────────── */
+  /* ── SCAN PAGE SECTIONS ──────────────────────────────────────────────────── */
   [data-ocr-section] {
     padding: 32px 16px 48px !important;
   }
-
-  /* ── Browse by Category section ─────────────────────────────────────────── */
   [data-category-grid-section] {
     padding: 48px 16px !important;
   }
 
-  /* ── Category cards: 1 col on phone ────────────────────────────────────── */
-  [data-category-cards] {
-    grid-template-columns: 1fr !important;
-    gap: 16px !important;
+  /* ── GRIDS (class-based, no !important needed) ───────────────────────────── */
+  .category-cards {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .category-product-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .pdp-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .pdp-details-grid {
+    grid-template-columns: 1fr;
+  }
+  .contrib-stats {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .contrib-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   /* ── CATEGORY PAGE: main container ──────────────────────────────────────── */
@@ -387,62 +438,52 @@ a {
     max-width: 100% !important;
   }
 
-  /* ── Product grid: 1 col on phone ────────────────────────────────────────── */
-  [data-product-grid] {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-  }
-
-  /* ── PRODUCT DETAIL PAGE: main container ────────────────────────────────── */
+  /* ── PRODUCT DETAIL PAGE: main ──────────────────────────────────────────── */
   [data-pdp-main] {
     padding: 80px 16px 48px !important;
     max-width: 100% !important;
   }
 
-  /* ── PDP hero: stack image above content ─────────────────────────────────── */
-  [data-pdp-hero-grid] {
-    grid-template-columns: 1fr !important;
-    gap: 16px !important;
+  /* ── CONTRIBUTIONS PAGE: header ─────────────────────────────────────────── */
+  [data-contrib-header] {
+    padding: 0 16px !important;
+    height: auto !important;
+    min-height: 56px !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
   }
 
-  /* ── Scan page main: reduce top padding ──────────────────────────────────── */
-  [data-page="scan"] main {
-    padding-top: 80px !important;
-  }
-}
-
-/* Small tablets: 2 col product/category grid */
-@media (min-width: 480px) and (max-width: 767px) {
-  [data-product-grid] {
-    grid-template-columns: 1fr 1fr !important;
-  }
-  [data-category-cards] {
-    grid-template-columns: 1fr 1fr !important;
-  }
-}
-
-/* Floating icons: hide on very small phones to avoid covering content */
-@media (max-width: 479px) {
-  [data-floating-icons] {
-    display: none !important;
-  }
-}
-
-/* ── FOOTER MOBILE ────────────────────────────────────────────────────────── */
-@media (max-width: 767px) {
+  /* ── FOOTER ──────────────────────────────────────────────────────────────── */
   [data-footer-inner] {
     padding: 40px 20px !important;
   }
-
   [data-footer-grid] {
     grid-template-columns: 1fr 1fr !important;
     gap: 32px !important;
   }
-
   [data-footer-bottom] {
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 12px !important;
+  }
+}
+
+/* ── Small tablets (480-767px): 2-col grids ─────────────────────────────── */
+@media (min-width: 480px) and (max-width: 767px) {
+  .category-product-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .category-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ── Very small phones (<400px) ─────────────────────────────────────────── */
+@media (max-width: 479px) {
+  [data-floating-icons] {
+    display: none !important;
   }
 }
 

@@ -46,6 +46,14 @@ export default function ContributionsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   const [products, setProducts] = useState<Contribution[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -154,8 +162,15 @@ export default function ContributionsPage() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#fafafa", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <style>{`
+        @media (max-width: 767px) {
+          .contrib-stats { flex-direction: column !important; }
+          .contrib-grid  { grid-template-columns: 1fr !important; }
+          [data-contrib-header] { padding: 0 16px !important; height: auto !important; min-height: 56px !important; flex-wrap: wrap !important; padding-top: 10px !important; padding-bottom: 10px !important; }
+        }
+      `}</style>
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <header style={{
+      <header data-contrib-header style={{
         backgroundColor: "#fff", borderBottom: "1px solid #ede8e6",
         padding: "0 48px", height: 64, display: "flex", alignItems: "center",
         justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50,
@@ -188,7 +203,7 @@ export default function ContributionsPage() {
       {/* ── Body ──────────────────────────────────────────────────────────── */}
       <main style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px 80px" }}>
         {/* Stats row */}
-        <div style={{ display: "flex", gap: 16, marginBottom: 40 }}>
+        <div data-contrib-stats className="contrib-stats" style={{ display: "flex", gap: 16, marginBottom: 40, flexDirection: isMobile ? "column" : "row" }}>
           {[
             { label: "Total Contributions", value: products.length, icon: "inventory_2" },
             { label: "With Nutri-Score", value: products.filter(p => p.nutri_score).length, icon: "grade" },
@@ -227,7 +242,7 @@ export default function ContributionsPage() {
 
         {/* Product grid */}
         {products.length > 0 && (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
+          <div data-contrib-grid className="contrib-grid" style={{ display: "grid", gap: 20, gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(300px, 1fr))" }}>
             {products.map((p) => {
               const nc = p.nutri_score ? NUTRI_COLORS[p.nutri_score.toUpperCase()] : null;
               return (

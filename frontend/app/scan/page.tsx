@@ -58,9 +58,17 @@ export default function ScanPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -207,12 +215,26 @@ export default function ScanPage() {
       backgroundPosition: "center -150px",
     }}>
       
-      {/* Floating Animations */}
+      {/* Floating Animations + Mobile Overrides */}
       <style>{`
         @keyframes float-icon {
           0% { transform: translateY(0px) rotate(0deg); }
           50% { transform: translateY(-20px) rotate(5deg); }
           100% { transform: translateY(0px) rotate(0deg); }
+        }
+        @media (max-width: 767px) {
+          .hero-inner { flex-direction: column !important; align-items: center !important; gap: 32px !important; }
+          .category-cards { grid-template-columns: 1fr !important; }
+          [data-nav="scan"] { padding: 0 16px !important; }
+          [data-desktop-links] { display: none !important; }
+          [data-hamburger] { display: flex !important; }
+          [data-floating-icons] { display: none !important; }
+          [data-hero] { padding: 24px 16px 32px !important; }
+          [data-hero-title] { font-size: 36px !important; }
+          [data-scanner-col] { max-width: 320px !important; flex: none !important; }
+          [data-text-col] { width: 100% !important; align-items: center !important; text-align: center !important; }
+          [data-ocr-section] { padding: 32px 16px 48px !important; }
+          [data-category-grid-section] { padding: 48px 16px !important; }
         }
       `}</style>
 
@@ -421,7 +443,7 @@ export default function ScanPage() {
           display: "flex",
           justifyContent: "center",
         }}>
-          <div data-hero-inner style={{ maxWidth: 1200, width: "100%", display: "flex", alignItems: "center", gap: 64 }}>
+          <div data-hero-inner className="hero-inner" style={{ maxWidth: 1200, width: "100%", gap: isMobile ? 32 : 64, display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: "center" }}>
             
             {/* Left: Scanner Mockup */}
             <div data-scanner-col style={{ flex: 1, display: "flex", justifyContent: "center", position: "relative" }}>
@@ -823,7 +845,7 @@ export default function ScanPage() {
               <a href="#" style={{ color: "var(--primary)", fontSize: 16, fontWeight: 700, textDecoration: "none" }}>View All</a>
             </div>
             
-            <div data-category-cards style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
+            <div data-category-cards className="category-cards" style={{ gap: 24, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(4, 1fr)" }}>
               {[
                 { label: "Biscuits", img: "/images/biscuits.jpg", bg: "#e8dcd0" },
                 { label: "Cold Drinks", img: "/images/drinks.jpg", bg: "#f3d9b1" },

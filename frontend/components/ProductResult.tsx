@@ -7,7 +7,7 @@
  */
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { IProductData } from "@/app/scan/page";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
@@ -78,6 +78,14 @@ function MacroDonut({ value, unit, label, pct, color, badge, badgeColor }: Donut
 export default function ProductResult({ product, onScanAnother }: { product: IProductData; onScanAnother: () => void }) {
   const [productData, setProductData] = useState<IProductData>(product);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   const handleAnalyze = async () => {
     if (!productData._id) {
@@ -122,6 +130,13 @@ export default function ProductResult({ product, onScanAnother }: { product: IPr
 
   return (
     <div style={{ background: "var(--surface-container-low)", color: "var(--fg)", minHeight: "100vh", fontFamily: "var(--font-body, 'Plus Jakarta Sans', sans-serif)" }}>
+      <style>{`
+        @media (max-width: 767px) {
+          [data-nav="product"] { padding: 0 16px !important; }
+          [data-desktop-links] { display: none !important; }
+          [data-pdp-main] { padding: 80px 16px 48px !important; }
+        }
+      `}</style>
 
       {/* Nav */}
       <header data-nav="product" style={{
@@ -154,8 +169,8 @@ export default function ProductResult({ product, onScanAnother }: { product: IPr
           <span style={{ fontWeight: 700, color: "var(--primary)" }}>{productData.product_name}</span>
         </div>
 
-        {/* Hero Grid */}
-        <div data-pdp-hero-grid style={{ display: "grid", gridTemplateColumns: "5fr 7fr", gap: 16, alignItems: "start" }}>
+        {/* Hero Grid - auto-collapses to 1 col on mobile */}
+        <div data-pdp-hero-grid className="pdp-hero-grid" style={{ gap: 16, alignItems: "start", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))" }}>
 
           {/* Image */}
           <div style={{
@@ -293,8 +308,8 @@ export default function ProductResult({ product, onScanAnother }: { product: IPr
           </div>
         )}
 
-        {/* Details Grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignItems: "start" }}>
+        {/* Details Grid - auto-collapses to 1 col on mobile */}
+        <div data-pdp-details-grid className="pdp-details-grid" style={{ gap: 16, alignItems: "start", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))" }}>
 
           {/* Left: Health Snapshot */}
           <div style={{ ...card, display: "flex", flexDirection: "column", gap: 24 }}>
