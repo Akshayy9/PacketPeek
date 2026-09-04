@@ -8,7 +8,7 @@
  * and reused in both batch scripts and live API routes.
  */
 
-import { INutrientsPer100g } from '../models/Product';
+import { INutrients } from '../models/Product';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -272,7 +272,7 @@ function proteinPoints(protein: number): number {
  * @returns A letter 'A'–'E', or `null` if insufficient nutrient data exists.
  */
 export function calculateNutriScore(
-  nutrients: INutrientsPer100g | null | undefined,
+  nutrients: INutrients | null | undefined,
   _category: string | null
 ): NutriScoreLetter | null {
   if (!nutrients) return null;

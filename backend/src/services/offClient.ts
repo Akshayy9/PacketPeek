@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { INutrientsPer100g } from '../models/Product';
+import { INutrients } from '../models/Product';
 
 const OFF_BASE_URL = 'https://world.openfoodfacts.org/api/v2/product';
 
@@ -11,7 +11,7 @@ export interface NormalizedProduct {
   image_url: string | null;
   ingredients_text: string | null;
   ingredients_list: string[] | null;
-  nutrients_per_100g: INutrientsPer100g | null;
+  nutrients_per_100g: INutrients | null;
   nutri_score: string | null;
   source: 'off';
 }
@@ -45,7 +45,7 @@ function safeNum(val: unknown): number | null {
 function normalizeOFFProduct(barcode: string, offProduct: Record<string, unknown>): NormalizedProduct {
   const nutriments = (offProduct['nutriments'] ?? {}) as Record<string, unknown>;
 
-  const nutrients: INutrientsPer100g = {
+  const nutrients: INutrients = {
     energy_kcal: safeNum(nutriments['energy-kcal_100g'] ?? nutriments['energy_100g']),
     sugar_g: safeNum(nutriments['sugars_100g']),
     protein_g: safeNum(nutriments['proteins_100g']),
