@@ -1,0 +1,298 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   PacketPeek — globals.css
+   Design system: Saffron Health Pulse  (Stitch MCP · projects/1991849065632301339)
+   Tailwind v4 — all config lives here, no tailwind.config.ts needed
+───────────────────────────────────────────────────────────────────────────── */
+
+@import "tailwindcss";
+
+/* ── 1. Dark-mode strategy: class-based via next-themes (attribute="class") ── */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   2. SEMANTIC CSS VARIABLES
+   :root  → light mode (Saffron Health Pulse — Stitch default)
+   .dark  → dark mode  (warm-brown inversion, saffron brand preserved)
+
+   These are the single source of truth. All @theme entries below point HERE,
+   so Tailwind utilities (bg-background, text-foreground, text-primary, etc.)
+   automatically reflect whichever theme is active.
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Light mode ─────────────────────────────────────────────────────────── */
+:root {
+  color-scheme: light;
+
+  /* ── Core semantic tokens (consumed by @theme below) ── */
+  --bg:                      #fcf9f8;   /* app canvas                        */
+  --fg:                      #1c1b1b;   /* primary text                      */
+
+  /* Primary — Bright Orange */
+  --primary:                 #ff6600;
+  --primary-container:       #ff8533;
+  --on-primary:              #ffffff;
+  --on-primary-container:    #662900;
+  --inverse-primary:         #ffb380;
+
+  /* Secondary — Bright Yellow */
+  --secondary:               #ffcc00;
+  --secondary-container:     #ffda4d;
+  --on-secondary:            #000000;
+  --on-secondary-container:  #665200;
+
+  /* Tertiary */
+  --tertiary:                #cc5200;
+  --tertiary-container:      #ff9966;
+  --on-tertiary:             #ffffff;
+  --on-tertiary-container:   #522100;
+
+  /* Surfaces */
+  --surface:                 #fcf9f8;
+  --surface-dim:             #dcd9d9;
+  --surface-bright:          #fcf9f8;
+  --surface-container-lowest:#ffffff;
+  --surface-container-low:   #f6f3f2;
+  --surface-container:       #f0eded;
+  --surface-container-high:  #eae7e7;
+  --surface-container-highest:#e5e2e1;
+  --surface-variant:         #e5e2e1;
+  --surface-tint:            #8c4f00;
+
+  /* On-surface text */
+  --on-surface:              #1c1b1b;
+  --on-surface-variant:      #554334;
+  --inverse-surface:         #313030;
+  --inverse-on-surface:      #f3f0ef;
+
+  /* Borders */
+  --outline:                 #887362;
+  --outline-variant:         #dbc2ae;
+
+  /* Error */
+  --error:                   #ba1a1a;
+  --on-error:                #ffffff;
+  --error-container:         #ffdad6;
+  --on-error-container:      #93000a;
+
+  /* Elevation shadows */
+  --shadow-card:             0 1px 3px 0 rgba(140, 79, 0, 0.08);
+  --shadow-float:            0 10px 25px -5px rgba(255, 149, 5, 0.15);
+  --shadow-stamp:            inset 0 2px 6px 0 rgba(100, 55, 0, 0.25);
+}
+
+/* ── Dark mode (.dark on <html>, set by next-themes) ────────────────────── */
+/* Dark mode is disabled to maintain the consistent light-mode aesthetic of the app */
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   3. @THEME — Tailwind v4 token registration
+   Maps CSS variables → Tailwind utility classes.
+   Pattern: --color-background: var(--bg)  →  bg-background, text-background, etc.
+   Because these point to CSS vars, utilities reflect the active theme (:root / .dark)
+   automatically without any extra configuration in components.
+══════════════════════════════════════════════════════════════════════════════ */
+@theme {
+  /* ── Fonts ─────────────────────────────────────────────────────────────── */
+  --font-display: "Bricolage Grotesque", sans-serif;
+  --font-body:    "Plus Jakarta Sans",   sans-serif;
+  --font-mono:    "JetBrains Mono",      monospace;
+
+  /* ── Semantic surface tokens (theme-aware via CSS vars) ─────────────────── */
+  --color-background:                var(--bg);
+  --color-foreground:                var(--fg);
+
+  --color-primary:                   var(--primary);
+  --color-primary-container:         var(--primary-container);
+  --color-on-primary:                var(--on-primary);
+  --color-on-primary-container:      var(--on-primary-container);
+  --color-inverse-primary:           var(--inverse-primary);
+
+  --color-secondary:                 var(--secondary);
+  --color-secondary-container:       var(--secondary-container);
+  --color-on-secondary:              var(--on-secondary);
+  --color-on-secondary-container:    var(--on-secondary-container);
+
+  --color-tertiary:                  var(--tertiary);
+  --color-tertiary-container:        var(--tertiary-container);
+  --color-on-tertiary:               var(--on-tertiary);
+  --color-on-tertiary-container:     var(--on-tertiary-container);
+
+  --color-surface:                   var(--surface);
+  --color-surface-dim:               var(--surface-dim);
+  --color-surface-bright:            var(--surface-bright);
+  --color-surface-container-lowest:  var(--surface-container-lowest);
+  --color-surface-container-low:     var(--surface-container-low);
+  --color-surface-container:         var(--surface-container);
+  --color-surface-container-high:    var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-surface-variant:           var(--surface-variant);
+  --color-surface-tint:              var(--surface-tint);
+
+  --color-on-surface:                var(--on-surface);
+  --color-on-surface-variant:        var(--on-surface-variant);
+  --color-inverse-surface:           var(--inverse-surface);
+  --color-inverse-on-surface:        var(--inverse-on-surface);
+
+  --color-outline:                   var(--outline);
+  --color-outline-variant:           var(--outline-variant);
+
+  --color-error:                     var(--error);
+  --color-on-error:                  var(--on-error);
+  --color-error-container:           var(--error-container);
+  --color-on-error-container:        var(--on-error-container);
+
+  /* ── Static brand tokens (fixed — never change with theme) ─────────────── */
+  --color-saffron:           #ff9505;   /* Deep Saffron — always vibrant       */
+  --color-saffron-dark:      #8c4f00;   /* Chocolate Brown                     */
+  --color-saffron-light:     #ffb874;   /* Peach                               */
+
+  /* ── Health grade traffic-light (semantic, never inverted) ─────────────── */
+  --color-grade-a:           #1a7a3c;
+  --color-grade-b:           #1a7a3c;
+  --color-grade-c:           #e07b00;
+  --color-grade-d:           #ba1a1a;
+  --color-grade-e:           #ba1a1a;
+
+  /* ── Border radius (from DESIGN.md shape language) ──────────────────────── */
+  --radius-sm:      0.25rem;   /* 4px  */
+  --radius-DEFAULT: 0.5rem;    /* 8px  */
+  --radius-md:      0.75rem;   /* 12px */
+  --radius-lg:      1rem;      /* 16px — cards  */
+  --radius-xl:      1.5rem;    /* 24px — buttons (pill) */
+  --radius-full:    9999px;
+
+  /* ── Spacing rhythm (8px scale from DESIGN.md) ──────────────────────────── */
+  /* NOTE: We deliberately avoid the --spacing-* prefix here.                  */
+  /* In Tailwind v4, any --spacing-* key inside @theme{} replaces the ENTIRE   */
+  /* default spacing scale (p-4, py-16, gap-8, etc.) which breaks all layouts. */
+  /* Use these as raw CSS vars in component styles if needed.                   */
+  --spacing: 0.25rem;  /* Restore the full default Tailwind spacing scale       */
+  --space-stack-sm:          0.5rem;    /* 8px  */
+  --space-stack-md:          1rem;      /* 16px */
+  --space-stack-lg:          2rem;      /* 32px */
+  --space-gutter:            1rem;      /* 16px */
+  --space-container-mobile:  1rem;      /* 16px */
+  --space-container-desktop: 7.5rem;    /* 120px */
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   4. BASE STYLES
+══════════════════════════════════════════════════════════════════════════════ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  min-height: 100%;
+  /* Smooth transitions when next-themes swaps the .dark class */
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html,
+body {
+  max-width: 100vw;
+}
+
+body {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body, "Plus Jakarta Sans", sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   5. TYPOGRAPHY HELPERS  (tri-font strategy from DESIGN.md)
+   Use these classes directly in JSX alongside Tailwind utilities.
+══════════════════════════════════════════════════════════════════════════════ */
+.font-display { font-family: var(--font-display, "Bricolage Grotesque", sans-serif); }
+.font-body    { font-family: var(--font-body,    "Plus Jakarta Sans",   sans-serif); }
+.font-data    { font-family: var(--font-mono,    "JetBrains Mono",      monospace);  }
+
+/* Type scale — exact values from DESIGN.md */
+.text-display-verdict {
+  font-family: var(--font-display);
+  font-size: 4.5rem;      /* 72px  */
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.text-headline-lg {
+  font-family: var(--font-display);
+  font-size: 2rem;        /* 32px */
+  font-weight: 700;
+  line-height: 2.5rem;    /* 40px */
+}
+.text-headline-lg-mobile {
+  font-family: var(--font-display);
+  font-size: 1.5rem;      /* 24px */
+  font-weight: 700;
+  line-height: 2rem;      /* 32px */
+}
+.text-headline-md {
+  font-family: var(--font-display);
+  font-size: 1.25rem;     /* 20px */
+  font-weight: 600;
+  line-height: 1.75rem;   /* 28px */
+}
+.text-body-lg {
+  font-family: var(--font-body);
+  font-size: 1.125rem;    /* 18px */
+  font-weight: 500;
+  line-height: 1.75rem;   /* 28px */
+}
+.text-body-md {
+  font-family: var(--font-body);
+  font-size: 1rem;        /* 16px */
+  font-weight: 400;
+  line-height: 1.5rem;    /* 24px */
+}
+.text-utility-data {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;    /* 14px */
+  font-weight: 600;
+  line-height: 1.25rem;   /* 20px */
+  letter-spacing: -0.02em;
+}
+.text-label-caps {
+  font-family: var(--font-body);
+  font-size: 0.75rem;     /* 12px */
+  font-weight: 700;
+  line-height: 1rem;      /* 16px */
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   6. ELEVATION HELPERS  (saffron-tinted ambient shadows)
+══════════════════════════════════════════════════════════════════════════════ */
+.shadow-card  { box-shadow: var(--shadow-card); }
+.shadow-float { box-shadow: var(--shadow-float); }
+.shadow-stamp { box-shadow: var(--shadow-stamp); }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   7. LAYOUT HELPERS
+══════════════════════════════════════════════════════════════════════════════ */
+.container-app {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1rem;   /* 16px — mobile */
+}
+
+@media (min-width: 1024px) {
+  .container-app {
+    padding-inline: 7.5rem; /* 120px — desktop */
+  }
+}
+
+
