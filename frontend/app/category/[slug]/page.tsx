@@ -25,6 +25,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
   
   const { user, loading: authLoading, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -77,7 +78,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
   return (
     <div style={{ background: "var(--bg)", color: "var(--fg)", minHeight: "100vh", fontFamily: "var(--font-body, 'Plus Jakarta Sans', sans-serif)" }}>
       {/* ── Top Nav ──────────────────────────────────────────────────────── */}
-      <nav style={{
+      <nav data-nav="category" style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, height: 68,
         background: "var(--surface)", borderBottom: "1px solid var(--outline-variant)",
         boxShadow: "var(--shadow-card)", display: "flex", alignItems: "center",
@@ -91,7 +92,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
         </a>
 
         {/* Nav links */}
-        <div style={{ display: "flex", alignItems: "center", gap: 36, fontSize: 16, fontWeight: 700 }}>
+        <div data-desktop-links style={{ display: "flex", alignItems: "center", gap: 36, fontSize: 16, fontWeight: 700 }}>
           <a href="/scan" style={{ color: "var(--on-surface-variant)", textDecoration: "none" }}>Scan</a>
           {/* Categories Dropdown */}
           <div style={{ position: "relative" }}
@@ -162,10 +163,31 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
         ) : (
           <a href="/login" style={{ backgroundColor: "var(--primary)", color: "#fff", textDecoration: "none", borderRadius: 10, padding: "9px 20px", fontSize: 14, fontWeight: 700, fontFamily: "var(--font-body)", boxShadow: "0 4px 14px -4px rgba(255,102,0,0.45)", whiteSpace: "nowrap" }}>Sign In</a>
         )}
+        <button data-hamburger onClick={() => setMobileMenuOpen(!mobileMenuOpen)} style={{ display: "none", alignItems: "center", justifyContent: "center", width: 44, height: 44, background: "none", border: "none", cursor: "pointer", color: "var(--on-surface)" }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 26 }}>{mobileMenuOpen ? 'close' : 'menu'}</span>
+        </button>
       </nav>
 
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div data-mobile-menu style={{
+          position: "fixed", top: 68, left: 0, right: 0, background: "var(--surface)",
+          borderBottom: "1px solid var(--outline-variant)", boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+          zIndex: 40, display: "flex", flexDirection: "column", padding: 24, gap: 24,
+        }}>
+          <a href="/scan" style={{ fontWeight: 700, fontSize: 17, color: "var(--on-surface-variant)", textDecoration: "none" }}>Scan</a>
+          <div style={{ fontWeight: 700, fontSize: 17, color: "var(--primary)" }}>Categories</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, paddingLeft: 16, borderLeft: "2px solid var(--outline-variant)" }}>
+            {["Biscuits", "Cold Drinks", "Snacks", "Chocolates"].map((label) => (
+              <a key={label} href={`/category/${encodeURIComponent(label)}`} style={{ fontSize: 15, fontWeight: 600, color: "var(--on-surface-variant)", textDecoration: "none" }}>{label}</a>
+            ))}
+          </div>
+          <a href="/contributions" style={{ fontWeight: 700, fontSize: 17, color: "var(--on-surface-variant)", textDecoration: "none" }}>My Contributions</a>
+        </div>
+      )}
+
       {/* ── Main Content ───────────────────────────────────────────────────── */}
-      <main style={{ maxWidth: 1200, margin: "0 auto", padding: "100px 48px 120px", display: "flex", flexDirection: "column", gap: 32 }}>
+      <main data-cat-main style={{ maxWidth: 1200, margin: "0 auto", padding: "100px 48px 120px", display: "flex", flexDirection: "column", gap: 32 }}>
         
         {/* Breadcrumbs */}
         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontFamily: "var(--font-mono)", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--on-surface-variant)" }}>
@@ -196,7 +218,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
         </div>
 
         {/* Product Grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 16 }}>
+        <div data-product-grid style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 16 }}>
           {products.map((p, idx) => {
             const grade = p.nutri_score as Grade | null;
             const meta = grade ? GRADE_META[grade] : null;

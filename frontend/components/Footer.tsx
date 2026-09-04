@@ -27,7 +27,7 @@ export default function Footer() {
         pointerEvents: 'none',
       }} />
 
-      <div style={{
+      <div data-footer-inner style={{
         maxWidth: '1280px',
         margin: '0 auto',
         padding: '64px 120px',
@@ -35,7 +35,7 @@ export default function Footer() {
         zIndex: 10,
       }}>
         {/* Grid */}
-        <div style={{
+        <div data-footer-grid style={{
           display: 'grid',
           gridTemplateColumns: '2fr 1fr 1fr 1fr',
           gap: '48px',
@@ -187,7 +187,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div style={{
+        <div data-footer-bottom style={{
           marginTop: '48px',
           paddingTop: '32px',
           borderTop: '1px solid #3d2e27',

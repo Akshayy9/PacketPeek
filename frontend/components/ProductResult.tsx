@@ -124,7 +124,7 @@ export default function ProductResult({ product, onScanAnother }: { product: IPr
     <div style={{ background: "var(--surface-container-low)", color: "var(--fg)", minHeight: "100vh", fontFamily: "var(--font-body, 'Plus Jakarta Sans', sans-serif)" }}>
 
       {/* Nav */}
-      <header style={{
+      <header data-nav="product" style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, height: 64,
         background: "var(--surface)", borderBottom: "1px solid var(--outline-variant)",
         boxShadow: "var(--shadow-card)", display: "flex", alignItems: "center",
@@ -132,7 +132,7 @@ export default function ProductResult({ product, onScanAnother }: { product: IPr
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
           <span style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 900, color: "var(--primary)", letterSpacing: "-0.04em" }}>PacketPeek</span>
-          <div style={{ display: "flex", gap: 24, fontSize: 11, fontFamily: "var(--font-mono)", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+          <div data-desktop-links style={{ display: "flex", gap: 24, fontSize: 11, fontFamily: "var(--font-mono)", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>
             {["Products", "Categories", "Contribute"].map((t, i) => (
               <a key={t} href="#" style={{
                 color: i === 0 ? "var(--primary)" : "var(--on-surface-variant)", textDecoration: "none",
@@ -144,7 +144,7 @@ export default function ProductResult({ product, onScanAnother }: { product: IPr
         <span className="material-symbols-outlined" style={{ color: "var(--on-surface-variant)", cursor: "pointer" }}>account_circle</span>
       </header>
 
-      <main style={{ maxWidth: 1280, margin: "0 auto", padding: "80px 48px 120px", display: "flex", flexDirection: "column", gap: 24 }}>
+      <main data-pdp-main style={{ maxWidth: 1280, margin: "0 auto", padding: "80px 48px 120px", display: "flex", flexDirection: "column", gap: 24 }}>
 
         {/* Breadcrumb */}
         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontFamily: "var(--font-mono)", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--on-surface-variant)" }}>
@@ -155,7 +155,7 @@ export default function ProductResult({ product, onScanAnother }: { product: IPr
         </div>
 
         {/* Hero Grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "5fr 7fr", gap: 16, alignItems: "start" }}>
+        <div data-pdp-hero-grid style={{ display: "grid", gridTemplateColumns: "5fr 7fr", gap: 16, alignItems: "start" }}>
 
           {/* Image */}
           <div style={{

@@ -296,3 +296,158 @@ a {
 }
 
 
+/* ══════════════════════════════════════════════════════════════════════════════
+   8. MOBILE RESPONSIVE OVERRIDES
+   Uses data-* attribute selectors + !important to override inline styles.
+   Desktop (≥768px) is UNCHANGED — all rules are mobile-first, scoped to max-width.
+══════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+
+  /* ── Prevent any horizontal overflow ─────────────────────────────────────── */
+  html, body {
+    overflow-x: hidden !important;
+  }
+
+  /* ── SCAN PAGE: Root wrapper ─────────────────────────────────────────────── */
+  [data-page="scan"] {
+    zoom: 1 !important;
+    background-size: cover !important;
+    background-position: center top !important;
+  }
+
+  /* ── ALL NAVBARS: Reduce horizontal padding ──────────────────────────────── */
+  [data-nav="scan"],
+  [data-nav="category"],
+  [data-nav="product"] {
+    padding: 0 16px !important;
+  }
+
+  /* ── Hide desktop nav links on mobile ────────────────────────────────────── */
+  [data-desktop-links] {
+    display: none !important;
+  }
+
+  /* ── Show hamburger button on mobile ─────────────────────────────────────── */
+  [data-hamburger] {
+    display: flex !important;
+  }
+
+  /* ── SCAN HERO: Stack vertically, reduce padding ─────────────────────────── */
+  [data-hero] {
+    padding: 24px 16px 32px !important;
+  }
+
+  [data-hero-inner] {
+    flex-direction: column !important;
+    gap: 32px !important;
+    align-items: center !important;
+  }
+
+  /* ── Scanner mockup: shrink for mobile ───────────────────────────────────── */
+  [data-scanner-col] {
+    width: 100% !important;
+    max-width: 320px !important;
+    flex: none !important;
+  }
+
+  /* ── Hero text column: center on mobile ──────────────────────────────────── */
+  [data-text-col] {
+    flex: none !important;
+    width: 100% !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  /* ── Hero h1: scale down ─────────────────────────────────────────────────── */
+  [data-hero-title] {
+    font-size: 36px !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* ── OCR Section: reduce the huge top padding ────────────────────────────── */
+  [data-ocr-section] {
+    padding: 32px 16px 48px !important;
+  }
+
+  /* ── Browse by Category section ─────────────────────────────────────────── */
+  [data-category-grid-section] {
+    padding: 48px 16px !important;
+  }
+
+  /* ── Category cards: 1 col on phone ────────────────────────────────────── */
+  [data-category-cards] {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* ── CATEGORY PAGE: main container ──────────────────────────────────────── */
+  [data-cat-main] {
+    padding: 88px 16px 64px !important;
+    max-width: 100% !important;
+  }
+
+  /* ── Product grid: 1 col on phone ────────────────────────────────────────── */
+  [data-product-grid] {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* ── PRODUCT DETAIL PAGE: main container ────────────────────────────────── */
+  [data-pdp-main] {
+    padding: 80px 16px 48px !important;
+    max-width: 100% !important;
+  }
+
+  /* ── PDP hero: stack image above content ─────────────────────────────────── */
+  [data-pdp-hero-grid] {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* ── Scan page main: reduce top padding ──────────────────────────────────── */
+  [data-page="scan"] main {
+    padding-top: 80px !important;
+  }
+}
+
+/* Small tablets: 2 col product/category grid */
+@media (min-width: 480px) and (max-width: 767px) {
+  [data-product-grid] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  [data-category-cards] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* Floating icons: hide on very small phones to avoid covering content */
+@media (max-width: 479px) {
+  [data-floating-icons] {
+    display: none !important;
+  }
+}
+
+/* ── FOOTER MOBILE ────────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  [data-footer-inner] {
+    padding: 40px 20px !important;
+  }
+
+  [data-footer-grid] {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 32px !important;
+  }
+
+  [data-footer-bottom] {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  [data-footer-grid] {
+    grid-template-columns: 1fr !important;
+  }
+}

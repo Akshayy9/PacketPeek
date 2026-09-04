@@ -57,6 +57,7 @@ export default function ScanPage() {
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
@@ -198,7 +199,7 @@ export default function ScanPage() {
   }
 
   return (
-    <div style={{ 
+    <div data-page="scan" style={{ 
       zoom: 0.9, color: "#1c1b1b", minHeight: "100vh", fontFamily: "var(--font-body, 'Plus Jakarta Sans', sans-serif)", position: "relative",
       backgroundImage: "url('/website_background_4k_transparent.jpg')",
       backgroundSize: "100% auto",
@@ -218,7 +219,7 @@ export default function ScanPage() {
       {/* Background Image Layer applied to parent div */}
 
       {/* Floating Background Icons (Spaced far out to the edges of the white space, away from text) */}
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1000, overflow: "hidden", zIndex: 0, pointerEvents: "none" }}>
+      <div data-floating-icons style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1000, overflow: "hidden", zIndex: 0, pointerEvents: "none" }}>
         {[
           // High up, middle (above text)
           { icon: "cookie", top: "10%", left: "52%", size: 65, delay: 2.7, duration: 8.5 },
@@ -254,7 +255,7 @@ export default function ScanPage() {
       </div>
 
       {/* ── Top Nav ──────────────────────────────────────────────────────── */}
-      <nav style={{
+      <nav data-nav="scan" style={{
         position: "absolute", top: 0, left: 0, right: 0, zIndex: 50, height: 80,
         background: "transparent",
         display: "flex", alignItems: "center",
@@ -271,7 +272,7 @@ export default function ScanPage() {
 
           {/* Right: Auth-Aware Action Group */}
           <div style={{ display: "flex", alignItems: "center", gap: 48 }}>
-            <div style={{ display: "flex", gap: 36, fontSize: 17, fontWeight: 700, alignItems: "center" }}>
+            <div data-desktop-links style={{ display: "flex", gap: 36, fontSize: 17, fontWeight: 700, alignItems: "center" }}>
               <a href="/scan" style={{ color: "var(--primary)", textDecoration: "none", borderBottom: "2px solid var(--primary)", paddingBottom: 4 }}>Scan</a>
               {/* Categories Dropdown */}
               <div style={{ position: "relative" }}
@@ -386,23 +387,44 @@ export default function ScanPage() {
                 Sign In
               </a>
             )}
+          <button data-hamburger onClick={() => setMobileMenuOpen(!mobileMenuOpen)} style={{ display: "none", alignItems: "center", justifyContent: "center", width: 44, height: 44, background: "none", border: "none", cursor: "pointer", color: "#111" }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 28 }}>{mobileMenuOpen ? 'close' : 'menu'}</span>
+          </button>
           </div>
         </nav>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div data-mobile-menu style={{
+            position: "fixed", top: 80, left: 0, right: 0, background: "#fdfaf8",
+            borderBottom: "1px solid #ede8e6", boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+            zIndex: 40, display: "flex", flexDirection: "column", padding: 24, gap: 24,
+          }}>
+            <a href="/scan" style={{ fontWeight: 700, fontSize: 17, color: "var(--primary)", textDecoration: "none" }}>Scan</a>
+            <div style={{ fontWeight: 700, fontSize: 17, color: "#1c1b1b" }}>Categories</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, paddingLeft: 16, borderLeft: "2px solid #ede8e6" }}>
+              {["Biscuits", "Cold Drinks", "Snacks", "Chocolates"].map((label) => (
+                <a key={label} href={`/category/${encodeURIComponent(label)}`} style={{ fontSize: 15, fontWeight: 600, color: "#555", textDecoration: "none" }}>{label}</a>
+              ))}
+            </div>
+            <a href="/contributions" style={{ fontWeight: 700, fontSize: 17, color: "#111", textDecoration: "none" }}>My Contributions</a>
+          </div>
+        )}
 
       {/* ── Main ─────────────────────────────────────────────────────────── */}
       <main style={{ display: "flex", flexDirection: "column", paddingTop: 100 }}>
         
         {/* ── Hero Section ─────────────────────────────────────────────── */}
-        <section style={{ 
+        <section data-hero style={{ 
           padding: "80px 48px 80px", 
           position: "relative",
           display: "flex",
           justifyContent: "center",
         }}>
-          <div style={{ maxWidth: 1200, width: "100%", display: "flex", alignItems: "center", gap: 64 }}>
+          <div data-hero-inner style={{ maxWidth: 1200, width: "100%", display: "flex", alignItems: "center", gap: 64 }}>
             
             {/* Left: Scanner Mockup */}
-            <div style={{ flex: 1, display: "flex", justifyContent: "center", position: "relative" }}>
+            <div data-scanner-col style={{ flex: 1, display: "flex", justifyContent: "center", position: "relative" }}>
               
               <div style={{ 
                 width: "100%", maxWidth: 400, background: "#111", // Dark phone-like bezel
@@ -480,8 +502,8 @@ export default function ScanPage() {
             </div>
 
             {/* Right: Typography & Search */}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start", position: "relative", zIndex: 10 }}>
-              <h1 style={{
+            <div data-text-col style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start", position: "relative", zIndex: 10 }}>
+              <h1 data-hero-title style={{
                 fontFamily: "var(--font-display)", fontSize: 64, fontWeight: 900, lineHeight: 1.05,
                 color: "#111", marginBottom: 24, letterSpacing: "-0.04em"
               }}>
@@ -583,7 +605,7 @@ export default function ScanPage() {
         </section>
 
         {/* ── OCR AI Scanner Section ─────────────────────────── */}
-        <section style={{ padding: "160px 48px 80px", display: "flex", justifyContent: "center", position: "relative", zIndex: 1 }}>
+        <section data-ocr-section style={{ padding: "160px 48px 80px", display: "flex", justifyContent: "center", position: "relative", zIndex: 1 }}>
           <div style={{ maxWidth: 1200, width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}>
             <div style={{ textAlign: "center", marginBottom: 16 }}>
               <h2 style={{ fontFamily: "var(--font-display)", fontSize: 52, fontWeight: 900, color: "#111", margin: "0 0 12px", letterSpacing: "-0.02em" }}>
@@ -794,14 +816,14 @@ export default function ScanPage() {
         </section>
 
         {/* ── Browse by Category ────────────────────────────── */}
-        <section style={{ padding: "100px 48px", background: "#fcf9f8", display: "flex", justifyContent: "center", position: "relative", zIndex: 1, borderTop: "1px solid rgba(0,0,0,0.05)" }}>
+        <section data-category-grid-section style={{ padding: "100px 48px", background: "#fcf9f8", display: "flex", justifyContent: "center", position: "relative", zIndex: 1, borderTop: "1px solid rgba(0,0,0,0.05)" }}>
           <div style={{ maxWidth: 1200, width: "100%" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 40 }}>
               <h2 style={{ fontFamily: "var(--font-display)", fontSize: 40, fontWeight: 800, color: "#1c1b1b", margin: 0, letterSpacing: "-0.02em" }}>Browse by Category</h2>
               <a href="#" style={{ color: "var(--primary)", fontSize: 16, fontWeight: 700, textDecoration: "none" }}>View All</a>
             </div>
             
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
+            <div data-category-cards style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
               {[
                 { label: "Biscuits", img: "/images/biscuits.jpg", bg: "#e8dcd0" },
                 { label: "Cold Drinks", img: "/images/drinks.jpg", bg: "#f3d9b1" },
