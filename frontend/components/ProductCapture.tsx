@@ -52,7 +52,8 @@ export default function ProductCapture() {
       const formData = new FormData();
       formData.append("image", file);
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || ""}/api/products/analyze-image`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+      const res = await fetch(`${API_URL}/api/products/analyze-image`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`

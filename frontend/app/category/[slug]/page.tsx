@@ -7,7 +7,7 @@ import Image from "next/image";
 import type { IProductData } from "@/app/scan/page";
 import { useAuth } from "@/context/AuthContext";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 type Grade = "A" | "B" | "C" | "D" | "E";
 
@@ -45,7 +45,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
   const fetchProducts = useCallback(async (pageNum: number) => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE}/api/product/category/${encodeURIComponent(categoryName)}?page=${pageNum}&limit=12`);
+      const res = await fetch(`${API_URL}/api/product/category/${encodeURIComponent(categoryName)}?page=${pageNum}&limit=12`);
       const data = await res.json();
       
       if (pageNum === 1) {

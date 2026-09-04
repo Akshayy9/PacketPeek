@@ -16,7 +16,7 @@ const BarcodeScanner = dynamic(() => import("@/components/BarcodeScanner"), {
   ),
 });
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 export interface IProductData {
   _id?: string;
@@ -104,7 +104,7 @@ export default function ScanPage() {
       const token = await user.getIdToken();
       const formData = new FormData();
       formData.append("image", ocrFile);
-      const res = await fetch(`${API_BASE}/api/products/analyze-image`, {
+      const res = await fetch(`${API_URL}/api/products/analyze-image`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -145,7 +145,7 @@ export default function ScanPage() {
     const fetchSearch = async () => {
       setIsSearching(true);
       try {
-        const res = await fetch(`${API_BASE}/api/product/search/query?q=${encodeURIComponent(query)}`);
+        const res = await fetch(`${API_URL}/api/product/search/query?q=${encodeURIComponent(query)}`);
         const data = await res.json();
         searchCache.current.set(query, data);
         setSearchResults(data);
@@ -165,7 +165,7 @@ export default function ScanPage() {
     setProduct(null);
     setErrorMsg(null);
     try {
-      const res = await fetch(`${API_BASE}/api/product/${barcode}`);
+      const res = await fetch(`${API_URL}/api/product/${barcode}`);
       const data = await res.json();
       if (!res.ok || !data.found) {
         setErrorMsg(data.error ?? "Product not found in our database.");

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import type { IProductData } from "@/app/scan/page";
 import ProductResult from "@/components/ProductResult";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 export default function ProductPage({ params }: { params: Promise<{ barcode: string }> }) {
   const { barcode } = use(params);
@@ -21,7 +21,7 @@ export default function ProductPage({ params }: { params: Promise<{ barcode: str
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE}/api/product/${barcode}`);
+        const res = await fetch(`${API_URL}/api/product/${barcode}`);
         if (!res.ok) {
           throw new Error("Product not found");
         }

@@ -10,7 +10,7 @@ import Image from "next/image";
 import { useState } from "react";
 import type { IProductData } from "@/app/scan/page";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 type Grade = "A" | "B" | "C" | "D" | "E";
 
@@ -86,7 +86,7 @@ export default function ProductResult({ product, onScanAnother }: { product: IPr
     }
     setIsAnalyzing(true);
     try {
-      const res = await fetch(`${API_BASE}/api/product/analyze`, {
+      const res = await fetch(`${API_URL}/api/product/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId: productData._id }),

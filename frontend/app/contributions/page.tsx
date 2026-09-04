@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 interface Nutrient {
   energy_kcal?: number | null;
@@ -65,7 +65,7 @@ export default function ContributionsPage() {
     setError(null);
     try {
       const token = await user.getIdToken();
-      const res = await fetch(`${API_BASE}/api/product/contributions`, {
+      const res = await fetch(`${API_URL}/api/product/contributions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
@@ -111,7 +111,7 @@ export default function ContributionsPage() {
         product_name: editForm.product_name,
         image_url: editForm.image_url || null,
       };
-      const res = await fetch(`${API_BASE}/api/product/${editTarget._id}`, {
+      const res = await fetch(`${API_URL}/api/product/${editTarget._id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
