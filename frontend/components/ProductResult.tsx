@@ -8,7 +8,12 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import type { IProductData } from "@/app/scan/page";
+import HealthyAlternatives from "@/components/HealthyAlternatives";
+
+// react-barcode renders an SVG barcode — SSR disabled to avoid canvas issues
+const Barcode = dynamic(() => import("react-barcode"), { ssr: false });
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
@@ -215,11 +220,37 @@ export default function ProductResult({ product, onScanAnother }: { product: IPr
               )}
             </div>
 
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, fontSize: 12, fontFamily: "var(--font-mono)", color: "var(--on-surface-variant)", marginBottom: 28 }}>
+            {/* Category / sub-category chips */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, fontSize: 12, fontFamily: "var(--font-mono)", color: "var(--on-surface-variant)", marginBottom: 12 }}>
               {productData.category && <span style={{ background: "var(--surface)", padding: "6px 14px", borderRadius: 999, boxShadow: "var(--shadow-card)" }}>{productData.category}</span>}
               {productData.sub_category && <span style={{ background: "var(--surface)", padding: "6px 14px", borderRadius: 999, boxShadow: "var(--shadow-card)" }}>{productData.sub_category}</span>}
-              <span style={{ padding: "6px 14px", borderLeft: "1px solid var(--outline-variant)" }}>#{productData.barcode}</span>
             </div>
+
+            {/* Visual barcode — sits below the chips in the empty space */}
+            {/^\d+$/.test(productData.barcode ?? '') && (
+              <div style={{
+                marginBottom: 28,
+                display: "inline-flex", flexDirection: "column", alignItems: "center",
+                background: "var(--surface)", borderRadius: 12, padding: "10px 16px",
+                border: "1px solid var(--outline-variant)", boxShadow: "var(--shadow-card)",
+                alignSelf: "flex-start",
+              }}>
+                <Barcode
+                  value={productData.barcode!}
+                  width={1.4}
+                  height={48}
+                  fontSize={10}
+                  margin={0}
+                  background="transparent"
+                  lineColor="var(--fg, #1c1b1b)"
+                  displayValue={false}
+                />
+                <span style={{ fontSize: 9, fontFamily: "var(--font-mono)", letterSpacing: "0.14em", color: "var(--on-surface-variant)", marginTop: 4 }}>
+                  #{productData.barcode}
+                </span>
+              </div>
+            )}
+
 
             {/* Health Overview */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: "auto" }}>
@@ -308,6 +339,48 @@ export default function ProductResult({ product, onScanAnother }: { product: IPr
           </div>
         )}
 
+        {/* ⚠️ Child Safety Warning — deterministic rule engine, no LLM */}
+        {productData.childSafetyVerdict && productData.childSafetyVerdict.minimumAge > 0 && (
+          <div style={{
+            ...card,
+            borderLeft: "4px solid var(--error)",
+            background: "rgba(186,26,26,0.04)",
+            border: "1px solid rgba(186,26,26,0.18)",
+            borderLeftWidth: 4,
+          }}>
+            {/* Header */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+              <div style={{
+                flexShrink: 0, width: 36, height: 36, borderRadius: "50%",
+                background: "rgba(186,26,26,0.1)", border: "2px solid var(--error)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 18, color: "var(--error)" }}>child_care</span>
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--error)", fontFamily: "var(--font-display)", letterSpacing: "-0.01em" }}>
+                  ⚠️ Not recommended for children under {productData.childSafetyVerdict.minimumAge} year{productData.childSafetyVerdict.minimumAge > 1 ? "s" : ""}
+                </div>
+                <div style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--on-surface-variant)", letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 2 }}>
+                  Deterministic Safety Rule · No AI involved
+                </div>
+              </div>
+            </div>
+            {/* Reasons list */}
+            <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
+              {productData.childSafetyVerdict.reasons.map((reason, i) => (
+                <li key={i} style={{
+                  display: "flex", alignItems: "flex-start", gap: 8,
+                  fontSize: 13, color: "var(--on-surface-variant)", lineHeight: 1.6,
+                }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 14, color: "var(--error)", flexShrink: 0, marginTop: 2 }}>warning</span>
+                  {reason}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* Details Grid - auto-collapses to 1 col on mobile */}
         <div data-pdp-details-grid className="pdp-details-grid" style={{ gap: 16, alignItems: "start", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))" }}>
 
@@ -372,14 +445,38 @@ export default function ProductResult({ product, onScanAnother }: { product: IPr
                   Macro Breakdown
                 </h3>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                  {[
-                    { v: n.saturated_fat_g, u: "g", label: "Saturated Fat", pct: satFatPct, color: "var(--error)", badge: (n.saturated_fat_g ?? 0) > 10 ? "High" : "Mod", bg: "rgba(186,26,26,0.08)" },
-                    { v: n.fat_g,           u: "g", label: "Total Fat",      pct: fatPct,    color: "var(--error)", badge: (n.fat_g ?? 0) > 20 ? "High" : "Mod", bg: "rgba(186,26,26,0.08)" },
-                    { v: n.sodium_mg,       u: "mg",label: "Sodium",         pct: sodPct,    color: "var(--tertiary-container)", badge: (n.sodium_mg ?? 0) > 600 ? "High" : "Mod", bg: "rgba(140,79,0,0.08)" },
-                    { v: n.protein_g,       u: "g", label: "Protein",        pct: protPct,   color: "var(--tertiary-container)", badge: (n.protein_g ?? 0) > 15 ? "Good" : "Mod", bg: "rgba(140,79,0,0.08)" },
-                  ].map(({ v, u, label, pct, color, badge, bg }) => (
-                    <MacroDonut key={label} value={v} unit={u} label={label} pct={pct} color={color} badge={badge} badgeColor={bg} />
-                  ))}
+                  {(() => {
+                    const satFatVal = n.saturated_fat_g ?? 0;
+                    const fatVal    = n.fat_g ?? 0;
+                    const sodVal    = n.sodium_mg ?? 0;
+                    const protVal   = n.protein_g ?? 0;
+
+                    // colour helpers — "bad" nutrients: low=green, mid=orange, high=red
+                    const badColor = (v: number, midThresh: number, highThresh: number) =>
+                      v > highThresh ? { color: "var(--error)", bg: "rgba(186,26,26,0.08)", badge: "High" }
+                      : v > midThresh ? { color: "#e07b00",     bg: "rgba(224,123,0,0.08)",  badge: "Mod"  }
+                      :                 { color: "#1a7a3c",     bg: "rgba(26,122,60,0.08)",   badge: "Low"  };
+
+                    // colour helper — "good" nutrient (protein): low=red, mid=orange, high=green
+                    const goodColor = (v: number, midThresh: number, highThresh: number) =>
+                      v >= highThresh ? { color: "#1a7a3c", bg: "rgba(26,122,60,0.08)",   badge: "Good" }
+                      : v >= midThresh ? { color: "#e07b00", bg: "rgba(224,123,0,0.08)",  badge: "Mod"  }
+                      :                  { color: "var(--error)", bg: "rgba(186,26,26,0.08)", badge: "Low" };
+
+                    const sf  = badColor(satFatVal, 5,  10);   // >10 High, 5-10 Mod, <5 Low
+                    const fat = badColor(fatVal,    10,  20);  // >20 High, 10-20 Mod, <10 Low
+                    const sod = badColor(sodVal,   300, 600);  // >600 High, 300-600 Mod, <300 Low
+                    const pro = goodColor(protVal,  8,  15);   // >=15 Good, 8-15 Mod, <8 Low
+
+                    return [
+                      { v: n.saturated_fat_g, u: "g",  label: "Saturated Fat", pct: satFatPct, ...sf  },
+                      { v: n.fat_g,           u: "g",  label: "Total Fat",      pct: fatPct,    ...fat },
+                      { v: n.sodium_mg,       u: "mg", label: "Sodium",         pct: sodPct,    ...sod },
+                      { v: n.protein_g,       u: "g",  label: "Protein",        pct: protPct,   ...pro },
+                    ].map(({ v, u, label, pct, color, badge, bg }) => (
+                      <MacroDonut key={label} value={v} unit={u} label={label} pct={pct} color={color} badge={badge} badgeColor={bg} />
+                    ));
+                  })()}
                 </div>
               </section>
             )}
@@ -518,6 +615,9 @@ export default function ProductResult({ product, onScanAnother }: { product: IPr
             )}
           </div>
         </div>
+
+        {/* Healthy Alternatives — RAG-powered section */}
+        <HealthyAlternatives barcode={productData.barcode ?? ''} />
       </main>
 
       {/* Desktop Action Bar */}

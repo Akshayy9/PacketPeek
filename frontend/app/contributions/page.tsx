@@ -3,6 +3,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+
+const BarcodeScanner = dynamic(() => import("@/components/BarcodeScanner"), { ssr: false });
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
@@ -65,6 +68,7 @@ export default function ContributionsPage() {
   });
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [isScanningBarcode, setIsScanningBarcode] = useState(false);
 
   // ── Fetch contributions ────────────────────────────────────────────────────
   const fetchContributions = useCallback(async () => {
@@ -100,6 +104,7 @@ export default function ContributionsPage() {
   const openEdit = (p: Contribution) => {
     setEditTarget(p);
     setSaveError(null);
+    setIsScanningBarcode(false);
     setEditForm({
       barcode: p.barcode ?? "",
       product_name: p.product_name,
@@ -356,15 +361,40 @@ export default function ContributionsPage() {
               {/* Barcode */}
               <div>
                 <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#554334", marginBottom: 6, letterSpacing: "0.05em", textTransform: "uppercase" }}>Barcode (EAN)</label>
-                <input
-                  type="text"
-                  value={editForm.barcode}
-                  onChange={e => setEditForm(prev => ({ ...prev, barcode: e.target.value }))}
-                  placeholder="e.g. 8901072004017"
-                  style={{ width: "100%", boxSizing: "border-box", padding: "11px 14px", background: "#f6f3f2", border: "1.5px solid transparent", borderRadius: 10, fontSize: 14, color: "#1c1b1b", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                  onFocus={e => { e.target.style.background = "#fff"; e.target.style.borderColor = "rgba(224,96,0,0.4)"; e.target.style.boxShadow = "0 0 0 3px rgba(224,96,0,0.07)"; }}
-                  onBlur={e => { e.target.style.background = "#f6f3f2"; e.target.style.borderColor = "transparent"; e.target.style.boxShadow = "none"; }}
-                />
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input
+                    type="text"
+                    value={editForm.barcode}
+                    onChange={e => setEditForm(prev => ({ ...prev, barcode: e.target.value }))}
+                    placeholder="e.g. 8901072004017"
+                    style={{ flex: 1, boxSizing: "border-box", padding: "11px 14px", background: "#f6f3f2", border: "1.5px solid transparent", borderRadius: 10, fontSize: 14, color: "#1c1b1b", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                    onFocus={e => { e.target.style.background = "#fff"; e.target.style.borderColor = "rgba(224,96,0,0.4)"; e.target.style.boxShadow = "0 0 0 3px rgba(224,96,0,0.07)"; }}
+                    onBlur={e => { e.target.style.background = "#f6f3f2"; e.target.style.borderColor = "transparent"; e.target.style.boxShadow = "none"; }}
+                  />
+                  <button 
+                    onClick={() => setIsScanningBarcode(prev => !prev)}
+                    style={{ background: "#fff3eb", border: "1.5px solid #E06000", borderRadius: 10, padding: "0 14px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#E06000" }}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: 20 }}>barcode_scanner</span>
+                  </button>
+                </div>
+                {isScanningBarcode && (
+                  <div style={{ marginTop: 12, borderRadius: 12, overflow: "hidden", border: "2px solid #E06000", position: "relative" }}>
+                    <BarcodeScanner 
+                      active={isScanningBarcode} 
+                      onScan={(barcode) => { 
+                        setEditForm(prev => ({ ...prev, barcode })); 
+                        setIsScanningBarcode(false); 
+                      }} 
+                    />
+                    <button 
+                      onClick={() => setIsScanningBarcode(false)}
+                      style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.6)", color: "#fff", border: "none", borderRadius: "50%", width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: 16 }}>close</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 

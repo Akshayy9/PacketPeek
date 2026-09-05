@@ -3,7 +3,7 @@
 import React, { useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
-export default function ProductCapture() {
+export default function ProductCapture({ barcode, onSuccess }: { barcode?: string; onSuccess?: (barcode: string) => void }) {
   const { user } = useAuth();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -51,6 +51,9 @@ export default function ProductCapture() {
 
       const formData = new FormData();
       formData.append("image", file);
+      if (barcode) {
+        formData.append("barcode", barcode);
+      }
 
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
       const res = await fetch(`${API_URL}/api/products/analyze-image`, {
@@ -70,9 +73,13 @@ export default function ProductCapture() {
       console.log("Analysis Result:", data);
       
       // Clear after success or redirect
-      alert("Product analyzed and saved successfully!");
-      setImagePreview(null);
-      setFile(null);
+      if (onSuccess) {
+        onSuccess(data.product.barcode);
+      } else {
+        alert("Product analyzed and saved successfully!");
+        setImagePreview(null);
+        setFile(null);
+      }
 
     } catch (err: any) {
       setError(err.message);

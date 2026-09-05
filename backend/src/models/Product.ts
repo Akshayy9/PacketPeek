@@ -33,6 +33,11 @@ export interface IProduct extends Document {
   source: 'off' | 'manual';
   contributor_uid?: string;     // Firebase UID of the user who submitted this
   contributor_email?: string;   // Email for display purposes
+  // ── Child-safety inputs (populated by AI /analyze or manual entry) ────────
+  added_sugar_g?: number | null;           // grams of added sugar per 100g
+  has_honey?: boolean | null;              // honey is dangerous for infants
+  has_artificial_sweeteners?: boolean | null;
+  artificial_colors?: string[] | null;     // E-number codes, e.g. ["E102","E129"]
   created_at: Date;
   updated_at: Date;
 }
@@ -74,6 +79,11 @@ const ProductSchema = new Schema<IProduct>(
     source: { type: String, enum: ['off', 'manual'], required: true },
     contributor_uid:   { type: String, index: true, default: null },
     contributor_email: { type: String, default: null },
+    // ── Child-safety inputs ───────────────────────────────────────────────
+    added_sugar_g:              { type: Number, default: null },
+    has_honey:                  { type: Boolean, default: null },
+    has_artificial_sweeteners:  { type: Boolean, default: null },
+    artificial_colors:          { type: [String], default: null },
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now },
   },

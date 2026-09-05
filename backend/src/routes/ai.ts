@@ -65,10 +65,21 @@ Only output the valid JSON, no markdown formatting or backticks.`;
       return;
     }
 
+    let targetBarcode = req.body.barcode || `manual_scan_${Date.now()}`;
+
+    // If a specific barcode was provided, check for existing
+    if (req.body.barcode) {
+      const existing = await Product.findOne({ barcode: req.body.barcode });
+      if (existing) {
+        res.status(409).json({ error: 'A product with this barcode already exists in the database.' });
+        return;
+      }
+    }
+
     // Save to MongoDB as a manual entry linked to the user
     const newProduct = new Product({
       _id: new mongoose.Types.ObjectId().toString(),
-      barcode: `manual_scan_${Date.now()}`,
+      barcode: targetBarcode,
       product_name: parsedData.product_name,
       brand: parsedData.brand,
       ingredients_text: parsedData.ingredients_text,

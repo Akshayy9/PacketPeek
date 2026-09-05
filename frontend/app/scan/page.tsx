@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import ProductResult from "@/components/ProductResult";
+import ProductCapture from "@/components/ProductCapture";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -44,9 +45,19 @@ export interface IProductData {
   sub_category: string | null;
   flagged_additives: string[];
   source: "off" | "manual";
+  // ── Child-safety inputs ──────────────────────────────────────────────────
+  added_sugar_g?: number | null;
+  has_honey?: boolean | null;
+  has_artificial_sweeteners?: boolean | null;
+  artificial_colors?: string[] | null;
+  childSafetyVerdict?: {
+    isRecommended: boolean;
+    minimumAge: number;
+    reasons: string[];
+  } | null;
 }
 
-type ScanState = "idle" | "scanning" | "loading" | "found" | "not_found" | "error";
+type ScanState = "idle" | "scanning" | "loading" | "found" | "not_found" | "error" | "adding_product";
 
 export default function ScanPage() {
   const { user, loading: authLoading, logout } = useAuth();
@@ -508,7 +519,28 @@ export default function ScanPage() {
                     <p style={{ color: '#78350f', margin: '8px 0 24px', fontSize: 14 }}>
                       Barcode <code>{lastBarcode}</code> is not in our database yet.
                     </p>
-                    <button onClick={handleReset} style={{ padding: "12px 24px", background: "#ff6600", color: "#fff", border: "none", borderRadius: 12, fontWeight: 700, cursor: "pointer" }}>Scan another</button>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      <button onClick={handleReset} style={{ padding: "12px 24px", background: "#ff6600", color: "#fff", border: "none", borderRadius: 12, fontWeight: 700, cursor: "pointer" }}>Scan another</button>
+                      {user && (
+                        <button onClick={() => setScanState('adding_product')} style={{ padding: "12px 24px", background: "transparent", color: "#ff6600", border: "2px solid #ff6600", borderRadius: 12, fontWeight: 700, cursor: "pointer" }}>Add this product</button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* ── Adding Product ── */}
+                {scanState === 'adding_product' && (
+                  <div style={{ background: '#fff', borderRadius: 28, padding: 24, height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                      <p style={{ fontSize: 18, margin: 0, fontWeight: 700 }}>Add Product</p>
+                      <button onClick={() => setScanState('not_found')} style={{ background: "none", border: "none", cursor: "pointer", color: "#666" }}>
+                        <span className="material-symbols-outlined">close</span>
+                      </button>
+                    </div>
+                    <ProductCapture 
+                      barcode={lastBarcode || undefined} 
+                      onSuccess={(barcode) => handleScan(barcode)} 
+                    />
                   </div>
                 )}
 

@@ -310,3 +310,89 @@ export function calculateNutriScore(
   if (rawScore <= 18) return 'D';
   return 'E';
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Child Safety Verdict (deterministic rule engine — NO LLM)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Shape of the structured child-safety output attached to every product. */
+export interface ChildSafetyVerdict {
+  /** true when minimumAge === 0 — safe for all ages with no concerns */
+  isRecommended: boolean;
+  /**
+   * Minimum age in years before this product should be consumed.
+   * 0 = no restriction, 1 = not for infants, 2 = WHO sugar/sweetener
+   * guideline, 12 = Southampton Six hyperactivity dyes.
+   */
+  minimumAge: number;
+  /** Human-readable reason strings, one per triggered rule. */
+  reasons: string[];
+}
+
+/** The "Southampton Six" — artificial colours with a proven link to
+ *  hyperactivity in children (EFSA / FSA 2007 study). */
+const SOUTHAMPTON_SIX = new Set(['E102', 'E104', 'E110', 'E122', 'E124', 'E129']);
+
+/**
+ * calculateChildSafety
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Deterministic, rule-based child safety assessment. No AI / LLM involved.
+ *
+ * Rules are evaluated in ascending age-restriction order; the most restrictive
+ * rule always wins and sets the final `minimumAge`.
+ *
+ * @param productData - Partial product fields needed for child safety checks.
+ */
+export function calculateChildSafety(productData: {
+  added_sugar_g?: number | null;
+  has_honey?: boolean | null;
+  has_artificial_sweeteners?: boolean | null;
+  artificial_colors?: string[] | null;
+}): ChildSafetyVerdict {
+  let minimumAge = 0;
+  const reasons: string[] = [];
+
+  const {
+    added_sugar_g,
+    has_honey,
+    has_artificial_sweeteners,
+    artificial_colors,
+  } = productData;
+
+  // ── Rule 1: Honey → age 1 (infant botulism risk) ────────────────────────
+  if (has_honey === true) {
+    minimumAge = Math.max(minimumAge, 1);
+    reasons.push('Contains honey — risk of infant botulism for children under 1 year.');
+  }
+
+  // ── Rule 2: Added sugar OR artificial sweeteners → age 2 (WHO guidelines)
+  if ((added_sugar_g != null && added_sugar_g > 0) || has_artificial_sweeteners === true) {
+    minimumAge = Math.max(minimumAge, 2);
+    const parts: string[] = [];
+    if (added_sugar_g != null && added_sugar_g > 0)
+      parts.push(`contains added sugar (${added_sugar_g}g/100g)`);
+    if (has_artificial_sweeteners === true)
+      parts.push('contains artificial sweeteners');
+    reasons.push(
+      `WHO guidelines advise against added sugar and sweeteners for children under 2 — product ${parts.join(' and ')}.`
+    );
+  }
+
+  // ── Rule 3: Southampton Six dyes → age 12 (hyperactivity link) ──────────
+  const matchedDyes = (artificial_colors ?? []).filter((c) =>
+    SOUTHAMPTON_SIX.has(c.toUpperCase().trim())
+  );
+  if (matchedDyes.length > 0) {
+    minimumAge = Math.max(minimumAge, 12);
+    reasons.push(
+      `Contains Southampton Six artificial colour${matchedDyes.length > 1 ? 's' : ''} (${matchedDyes.join(', ')}) linked to hyperactivity in children — not recommended under 12.`
+    );
+  }
+
+  return {
+    isRecommended: minimumAge === 0,
+    minimumAge,
+    reasons,
+  };
+}
+
