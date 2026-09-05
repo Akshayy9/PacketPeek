@@ -4,7 +4,7 @@ import { fetchFromOFF } from '../services/offClient';
 import { mergeOrInsertOFFProduct } from '../services/productInterceptor';
 import { pinecone, PINECONE_INDEX_NAME, generateQueryEmbedding } from '../utils/pinecone';
 import { verifyAuth, AuthRequest } from '../middleware/auth';
-import { calculateChildSafety } from '../services/scoringEngine';
+import { calculateChildSafety, enrichAdditives } from '../services/scoringEngine';
 
 const router = Router();
 
@@ -318,7 +318,8 @@ router.get('/:barcode', async (req: Request, res: Response) => {
     if (cached) {
       console.log(`[CACHE] HIT for barcode: ${barcode}`);
       const childSafetyVerdict = calculateChildSafety(cached);
-      res.json({ found: true, source: 'cache', product: { ...cached, childSafetyVerdict } });
+      const additiveBreakdown = enrichAdditives(cached.flagged_additives);
+      res.json({ found: true, source: 'cache', product: { ...cached, childSafetyVerdict, additiveBreakdown } });
       return;
     }
 
@@ -336,7 +337,8 @@ router.get('/:barcode', async (req: Request, res: Response) => {
     const product = await mergeOrInsertOFFProduct(normalized);
     const productObj = product.toObject();
     const childSafetyVerdict = calculateChildSafety(productObj);
-    res.json({ found: true, source: 'off', product: { ...productObj, childSafetyVerdict } });
+    const additiveBreakdown = enrichAdditives(productObj.flagged_additives);
+    res.json({ found: true, source: 'off', product: { ...productObj, childSafetyVerdict, additiveBreakdown } });
   } catch (err) {
     console.error(`[ERROR] /api/product/${barcode}:`, err);
     const message = err instanceof Error ? err.message : 'Internal server error';

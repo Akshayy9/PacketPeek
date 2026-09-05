@@ -55,6 +55,11 @@ export interface IProductData {
     minimumAge: number;
     reasons: string[];
   } | null;
+  additiveBreakdown?: {
+    name: string;
+    risk_level: string;
+    long_term_effects: string;
+  }[];
 }
 
 type ScanState = "idle" | "scanning" | "loading" | "found" | "not_found" | "error" | "adding_product";

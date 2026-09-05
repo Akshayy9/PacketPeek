@@ -1,0 +1,22 @@
+{
+  "E442": {
+    "name": "Ammonium Phosphatides (E442)",
+    "risk_level": "Caution",
+    "long_term_effects": "An artificial emulsifier mostly used in chocolate. Safe in normal amounts, but heavily processed."
+  },
+  "E471": {
+    "name": "Mono- and Diglycerides (E471)",
+    "risk_level": "Caution",
+    "long_term_effects": "Used to mix water and oil. It can contain hidden trans fats, which are bad for heart health if eaten daily."
+  },
+  "E476": {
+    "name": "PGPR (E476)",
+    "risk_level": "Caution",
+    "long_term_effects": "Often used as a cheap chemical replacement for real cocoa butter. Best to limit in a healthy diet."
+  },
+  "Artificial Flavouring Substances": {
+    "name": "Artificial Flavours",
+    "risk_level": "Avoid",
+    "long_term_effects": "Lab-made chemicals used to mimic real food flavors. They offer zero nutrition and encourage eating ultra-processed foods."
+  }
+}

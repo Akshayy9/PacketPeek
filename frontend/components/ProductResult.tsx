@@ -84,6 +84,7 @@ export default function ProductResult({ product, onScanAnother }: { product: IPr
   const [productData, setProductData] = useState<IProductData>(product);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isAdditivesExpanded, setIsAdditivesExpanded] = useState(false);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -543,26 +544,76 @@ export default function ProductResult({ product, onScanAnother }: { product: IPr
                 </div>
               )}
 
-              {/* Flagged additives */}
-              {productData.flagged_additives.length > 0 && (
+              {/* Additive Breakdown */}
+              {productData.additiveBreakdown && productData.additiveBreakdown.length > 0 && (
                 <div style={{ background: "rgba(186,26,26,0.05)", border: "1px solid rgba(186,26,26,0.1)", borderRadius: 14, padding: 20 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, fontFamily: "var(--font-mono)", color: "var(--error)", fontWeight: 700, marginBottom: 14 }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 16 }}>warning</span>
-                    {productData.flagged_additives.length} additive{productData.flagged_additives.length > 1 ? "s" : ""} worth knowing about
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, fontFamily: "var(--font-mono)", color: "var(--error)", fontWeight: 700 }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: 16 }}>warning</span>
+                      {productData.additiveBreakdown.length} additive{productData.additiveBreakdown.length > 1 ? "s" : ""} worth knowing about
+                    </div>
+                    <button 
+                      onClick={() => setIsAdditivesExpanded(!isAdditivesExpanded)}
+                      style={{ 
+                        background: "none", border: "none", cursor: "pointer", 
+                        display: "flex", alignItems: "center", gap: 4, 
+                        fontSize: 11, fontFamily: "var(--font-mono)", fontWeight: 700, 
+                        color: "var(--error)", padding: 0 
+                      }}
+                    >
+                      {isAdditivesExpanded ? "Hide Breakdown" : "View Breakdown"}
+                      <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
+                        {isAdditivesExpanded ? "expand_less" : "expand_more"}
+                      </span>
+                    </button>
                   </div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                    {productData.flagged_additives.map((a) => (
-                      <span key={a} style={{
+                  
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: isAdditivesExpanded ? 16 : 0 }}>
+                    {productData.additiveBreakdown.map((additive, i) => (
+                      <span key={i} style={{
                         background: "var(--surface-container-lowest)", color: "var(--error)",
                         fontFamily: "var(--font-mono)", fontSize: 10, padding: "6px 12px",
                         borderRadius: 8, display: "flex", alignItems: "center", gap: 4,
                         border: "1px solid rgba(186,26,26,0.1)", boxShadow: "var(--shadow-card)",
                       }}>
                         <span className="material-symbols-outlined" style={{ fontSize: 12 }}>science</span>
-                        {a}
+                        {additive.name.split(' (')[0]}
                       </span>
                     ))}
                   </div>
+
+                  {isAdditivesExpanded && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12, borderTop: "1px solid rgba(186,26,26,0.1)", paddingTop: 16 }}>
+                      {productData.additiveBreakdown.map((additive, i) => {
+                        const isAvoid = additive.risk_level === "Avoid";
+                        const isCaution = additive.risk_level === "Caution";
+                        const color = isAvoid ? "var(--error)" : isCaution ? "#e07b00" : "#64748b";
+                        const bgColor = isAvoid ? "rgba(186,26,26,0.08)" : isCaution ? "rgba(224,123,0,0.08)" : "rgba(100,116,139,0.08)";
+                        const borderColor = isAvoid ? "rgba(186,26,26,0.2)" : isCaution ? "rgba(224,123,0,0.2)" : "rgba(100,116,139,0.2)";
+
+                        return (
+                          <div key={i} style={{
+                            background: "var(--surface)", border: `1px solid ${borderColor}`,
+                            borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", gap: 8,
+                            boxShadow: "var(--shadow-card)",
+                          }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                              <span style={{ fontSize: 14, fontWeight: 700, color: "var(--fg)" }}>{additive.name}</span>
+                              <span style={{
+                                background: bgColor, color: color, padding: "4px 10px", borderRadius: 999,
+                                fontSize: 10, fontFamily: "var(--font-mono)", fontWeight: 700, textTransform: "uppercase"
+                              }}>
+                                {additive.risk_level}
+                              </span>
+                            </div>
+                            <p style={{ fontSize: 13, color: "var(--on-surface-variant)", lineHeight: 1.5, margin: 0 }}>
+                              {additive.long_term_effects}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
 

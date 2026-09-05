@@ -204,6 +204,52 @@ export function analyzeIngredients(
   return flagged;
 }
 
+import additivesData from '../data/additives.json';
+
+export interface EnrichedAdditive {
+  name: string;
+  risk_level: string;
+  long_term_effects: string;
+}
+
+/**
+ * Enriches an array of additive names (e.g. from flagged_additives) using the additives.json dictionary.
+ * If an additive is unknown, provides a safe fallback object.
+ */
+export function enrichAdditives(additives: string[] | null | undefined): EnrichedAdditive[] {
+  if (!additives || !Array.isArray(additives)) return [];
+  
+  const dict: Record<string, EnrichedAdditive> = additivesData;
+  const dictKeys = Object.keys(dict);
+  
+  return additives.map((additive) => {
+    const rawAdditive = additive.trim();
+    const lowerAdditive = rawAdditive.toLowerCase();
+    
+    // Try exact match first
+    if (dict[rawAdditive]) {
+      return dict[rawAdditive];
+    }
+    
+    // Try partial match (e.g., if incoming is "E442 (Ammonium phosphatides)" and key is "E442")
+    const matchedKey = dictKeys.find(key => 
+      lowerAdditive.includes(key.toLowerCase()) || 
+      key.toLowerCase().includes(lowerAdditive)
+    );
+    
+    if (matchedKey) {
+      return dict[matchedKey];
+    }
+    
+    // Fallback for unknown additives
+    return {
+      name: rawAdditive,
+      risk_level: "Neutral",
+      long_term_effects: "A common food additive used for texture, shelf-life, or flavor. Try to prioritize whole foods when possible."
+    };
+  });
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Nutri-Score helpers (simplified FSA points system)
 // ─────────────────────────────────────────────────────────────────────────────
