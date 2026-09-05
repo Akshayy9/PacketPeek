@@ -9,6 +9,24 @@ PacketPeek is a full-stack nutritional analysis application that provides immedi
 - Database & AI: MongoDB, Pinecone (Vector Database), Google Gemini API
 - Deployment: Cloudflare Pages (Frontend), Render (Backend)
 
+## Project Structure
+
+```text
+PacketPeek/
+├── frontend/               # Next.js App Router Application
+│   ├── app/                # Pages & Routes (Scan, Login, Contributions)
+│   ├── components/         # Reusable React components (BarcodeScanner, etc.)
+│   ├── context/            # React Context (Firebase Auth)
+│   └── hooks/              # Custom React Hooks
+└── backend/                # Express & TypeScript API
+    ├── src/
+    │   ├── models/         # Mongoose Schemas (Product, etc.)
+    │   ├── routes/         # Express API Routes (product.ts, ai.ts)
+    │   ├── services/       # Core Business Logic & Rule Engines
+    │   ├── middleware/     # Auth and validation middleware
+    │   └── utils/          # Helpers (Pinecone, Gemini RAG logic)
+```
+
 ## Environment Variables
 
 ### Frontend (.env.local)
