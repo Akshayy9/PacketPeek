@@ -44,15 +44,17 @@ export default function BarcodeScanner({ onScan, onError, active }: BarcodeScann
 
       onScan(result.rawValue);
     },
-    onError(error) {
+    onError(err: unknown) {
       // react-zxing throws errors continuously when no barcode is in frame,
       // so we typically don't want to propagate these up as fatal UI errors.
       // We only pass initialization errors (which usually happen immediately).
+      const errorMessage = err instanceof Error ? err.message : String(err);
       if (
-        error.message && 
-        (error.message.includes("Permission") || error.message.includes("NotAllowedError") || error.message.includes("Requested device not found"))
+        errorMessage.includes("Permission") || 
+        errorMessage.includes("NotAllowedError") || 
+        errorMessage.includes("Requested device not found")
       ) {
-         if (onError) onError(error.message);
+         if (onError) onError(errorMessage);
       }
     }
   });
